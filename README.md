@@ -43,24 +43,24 @@ Example:
 - - node (HTMLInputElement) — the target input element
 - - extra_ls (Array) — list of objects with input/output metadata:
   ```js
-    {
-      input: {
-        file: File,
-        name: String,
-        type: String,
-        size: Number (bytes),
-        height: Number (px),
-        width: Number (px)
+   {
+    input: {
+      file: file, // (File instance) - original image file
+      name: fileName, // (String) - original image name
+      type: fileType, // (String) - original image MIME type
+      size: fileSize, // (Number) - original image size in bytes
+      height: imageHeight, // (Number) - original image height in pixels
+      width: imageWidth // (Number) - original image width in pixels
     },
-      output: {
-        file: File,
-        name: String,
-        type: String,
-        size: Number (bytes),
-        height: Number (px),
-        width: Number (px)
-      }
+    output: {
+      file: file, // (File instance) - resized image file
+      name: fileName, // (String) - resized image name
+      type: fileType, // (String) - resized image MIME type
+      size: fileSize, // (Number) - resized image size in bytes
+      height: imageHeight, // (Number) - resized image height in pixels
+      width: imageWidth // (Number) - resized image width in pixels
     }
+  }
   ```
     Example:
     ```html
@@ -78,4 +78,10 @@ Example:
   <input type=file id=origin_img name=origin_img>
   <input type=file name=medium_img style='display: none' data-uploading-image-resizer='target: origin_img, type: webp, max_height: 1080, max_width: 1920'>
   <input type=file name=small_img style='display: none' data-uploading-image-resizer='target: origin_img, type: webp, max_height: 500, max_width: 850'>
-   ```  
+   ```
+   You can also modify the original while creating other versions:
+  ```html
+  <input type=file id=origin_img name=big_img data-uploading-image-resizer='target: origin_img, type: webp, max_height: 2000, max_width: 4000'>
+		<input type=file name=medium_img style='display: none' data-uploading-image-resizer='target: origin_img, type: webp, max_height: 1080, max_width: 1920'>
+		<input type=file name=small_img style='display: none' data-uploading-image-resizer='target: origin_img, type: webp, max_height: 500, max_width: 850'>		
+  ```
