@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+	
+	<head>
+		
+		<meta charset='UTF-8'>
+		
+		<meta name='viewport' content='width=device-width, maximum-scale=1.0, minimum-scale=1.0'>
+		
+		<style>
+			
+			body{
+				background: #EEAECA;
+				background: radial-gradient(circle,rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%);
+				--container_shadow: 0 2px 4px 1px rgba(0, 0, 60, .4);
+			}
+			
+			h1{
+				text-align: center;
+			}
+			
+			form {
+				box-shadow: var(--container_shadow);
+				border-radius: .4rem;
+				padding: 2rem;
+				margin: 1rem;
+				background-color: rgba(255, 255, 255, .5);
+				
+				img{
+					margin: 1rem;
+				}
+				
+				.key_col{
+					font-size: small;
+					font-weight: bold;
+				}
+				
+				.data_col{
+					font-size: small;
+				}
+			}
+			
+			.options_form{
+				margin: 1rem;
+				font-size: small;
+				label{
+					display: block;
+					margin: .5rem;
+					font-weight: bold;
+				}
+			}
+			
+		</style>
+		
+		<script language="JavaScript" src="./uploading_image_resizer.js"></script>
+		
+		<script language="JavaScript">		
+			
+			/* Rounds the number [value] to [decimals] decimal places. Should work without the bugs inherent in JS and others.
+				Author: Jack L Moore
+				-------
+				Arguments:
+					value (Number Float) - number to be rounded 
+					[ decimals ](Integer) - the coordinate to scroll to; if absent (or null, undefined), it scrolls to the end
+				-------
+				Return:
+					Number Float */
+			const round = (value, decimals = 0) => Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+			
+			/* Function converts bytes to human-readable text.
+				-------
+				Arguments:
+					x (Integer) - bytes to be converted
+				-------
+				Return:
+					String */
+			const bytes_to_text = (x) => x >= 1073741824 ? round(x/1073741824, 2) + 'Gb' : x >= 1048576 ? round(x/1048576) + 'Mb' : x >= 1024 ? round(x/1024) + 'Kb' : x + 'Bytes'; 
+			
+			
+			const foo = (node, extra_ls, time) => {
+				const add_row = (key, data) => {
+					const 
+						row = document.createElement('div'),
+						key_col = document.createElement('span'),
+						data_col = document.createElement('span');
+					key_col.className = 'key_col';	
+					data_col.className = 'data_col';	
+					key_col.innerText = key + ': ';
+					data_col.innerText = data;
+					row.append(key_col, data_col);
+					return row;
+				};
+				extra_ls.forEach(v => {
+					const img = new Image();
+					img.src = URL.createObjectURL(v.output.file);
+					img.style = 'max-width: 90%; display: block;';
+					const 
+						data = document.createElement('div'),
+						input_data = document.createElement('div'),
+						output_data = document.createElement('div'),
+						input_h = document.createElement('h4'),
+						output_h = document.createElement('h4');
+					input_h.innerText = 'Input';
+					input_data.append(
+						input_h
+						, add_row('name', v.input.name)
+						, add_row('type', v.input.type)
+						, add_row('size', bytes_to_text(v.input.size))
+						, add_row('height', v.input.height + 'px')
+						, add_row('width', v.input.width + 'px')
+					);
+					output_h.innerText = 'Output';
+					output_data.append(
+						output_h
+						, add_row('name', v.output.name)
+						, add_row('type', v.output.type)
+						, add_row('size', bytes_to_text(v.output.size))
+						, add_row('height', round(v.output.height) + 'px')
+						, add_row('width', round(v.output.width) + 'px')
+						, time ? add_row('time spent', time + 'msec') : ''
+					);
+					data.append(input_data, output_data, img);
+					node.parentNode.append(data);
+				});
+				
+			};
+			
+			const reset_handler = form => {
+				[...form.childNodes].forEach(child => child.nodeName.toLowerCase() === 'div' && child.className !== 'options_form' && child.remove());
+			};
+			
+			const options_change = () => {
+				const 
+					file = document.getElementById('file'),
+					name = document.getElementById('name'),
+					type = document.getElementById('type'),
+					quality = document.getElementById('quality'),
+					max_height = document.getElementById('max_height'),
+					max_width = document.getElementById('max_width'),
+					height = document.getElementById('height'),
+					width = document.getElementById('width'),
+					options = {name: name.value || undefined, type: type.value || undefined, quality: +quality.value, max_height: +max_height.value || undefined, max_width: +max_width.value || undefined, height: +height.value || undefined, width: +width.value || undefined};	
+				if(file.value){
+					const start_time = performance.now();
+					resize_image_file(file.files[0], {...options, get_extra_data: true}).then(res => {
+						reset_handler(file.parentNode);
+						foo(file, [res], performance.now() - start_time);
+					});
+				}
+				file.parentNode.querySelector('h3').innerText = 'data-uploading-image-resizer="' + JSON.stringify(options).replaceAll('"', '').replaceAll('{', '').replaceAll('}', '').replaceAll(':', ': ').replaceAll(',', ', ') + '"';
+			};
+			
+			window.onload = () => {
+				[...document.querySelectorAll('form')].forEach(f => f.reset());
+			};
+			
+			const add_form = () => {
+				const div = document.createElement('div');
+				div.innerHTML = `
+					<form onreset="reset_handler(this)">		
+			
+						<h3> data-uploading-image-resizer='max_height: 400, type: webp, quality: .5' </h3>
+						
+						<input type=file accept=".jpg, .jpeg, .png, .gif, .webp" data-uploading-image-resizer='max_height: 100, callback: foo, type: jpg'>
+						
+						<input type=reset>
+					
+					</form>
+				`;
+				document.body.append(div);
+			};
+			
+		</script>
+		
+		<title> Uploading-Image-Resizer Demo Example </title>
+	
+	</head>
+	
+	<body>	
+		
+		<h1> Uploading-Image-Resizer Demo Example </h1>
+		
+		<form onreset="reset_handler(this)">		
+			
+			<h3> Options </h3>
+			
+			<input type=file id=file accept=".jpg, .jpeg, .png, .gif, .webp" onchange='options_change()'>
+			
+			<input type=reset>
+			
+			<div class=options_form>
+				
+				<label> name: <input id=name type=text placeholder='same as the original' onchange='options_change()'> </label>
+				
+				<label> type: <select id=type onchange='options_change()'> <option value=''> same as the original </option> <option> jpeg </option> <option> png </option> <option> gif </option> <option> webp </option> </select> </label>
+				
+				<label> quality: <input id=quality type=number value=1 min=0 max=1 step=0.1 onchange='options_change()'> </label>
+				
+				<label> max_height: <input id=max_height type=number min=0 onchange='options_change()'> </label>
+				
+				<label> max_width: <input id=max_width type=number min=0 onchange='options_change()'> </label>
+				
+				<label> height: <input id=height type=number min=0 onchange='options_change()'> </label>
+				
+				<label> width: <input id=width type=number min=0 onchange='options_change()'> </label>
+				
+			</div>
+		
+		</form>
+		
+		<form onreset="reset_handler(this)">		
+			
+			<h3> data-uploading-image-resizer='max_height: 200, type: jpg' </h3>
+			
+			<input id=origin_file type=file accept=".jpg, .jpeg, .png, .gif, .webp" data-uploading-image-resizer='max_height: 100, callback: foo, type: jpg'>
+			
+			<input type=reset>
+		
+		</form>
+		
+		<form>
+			
+			<h3> data-uploading-image-resizer='target: origin_file, max_height: 400' </h3>
+			
+			<input type=file disabled data-uploading-image-resizer='target: origin_file, max_height: 200, callback: foo'>
+		
+		</form>
+		
+		
+		<button onclick='add_form()'> Add Form </button>
+		
+	
+	</body>
+
+</html>
