@@ -105,56 +105,56 @@ resize_image_file(image_file, options)
 - image_file (File) — image file (Blob), e.g., from input.files or created dynamically.
 - options (Object) — same options as the attribute form (keys as object properties).
 Options (object form):
+- - type (String) — output image type: jpeg, png, webp, gif. If omitted, the original type is preserved.
+- - max_height (Float) — maximum height in pixels (resize only if original height exceeds this).
+- - max_width (Float) — maximum width in pixels (resize only if original width exceeds this).
+- - quality (Float) — quality level 0–1 (applies to jpeg and webp only). Default: 1.
+- - name (String) — output file name; the extension can be used to infer the output type. If omitted, the original name is preserved.
+- - height (Float) — exact output height in pixels.
+- - width (Float) — exact output width in pixels.
+- - get_extra_data (Boolean) — if true, the function returns additional metadata instead of only a Blob/File (default: false).
+	The extra-data structure:
 ```javascript
-	- type (String) — output image type: jpeg, png, webp, gif. If omitted, the original type is preserved.
-	- max_height (Float) — maximum height in pixels (resize only if original height exceeds this).
-	- max_width (Float) — maximum width in pixels (resize only if original width exceeds this).
-	- quality (Float) — quality level 0–1 (applies to jpeg and webp only). Default: 1.
-	- name (String) — output file name; the extension can be used to infer the output type. If omitted, the original name is preserved.
-	- height (Float) — exact output height in pixels.
-	- width (Float) — exact output width in pixels.
-	- get_extra_data (Boolean) — if true, the function returns additional metadata instead of only a Blob/File (default: false).
-		The extra-data structure:
-		{
-			input: {
-				file: file, // (File instance) — original image file
-				name: fileName, // (String) — original image name
-				type: fileType, // (String) — original image MIME type
-				size: fileSize, // (Number) — original image size in bytes
-				height: imageHeight, // (Number) — original image height in pixels
-				width: imageWidth // (Number) — original image width in pixels
-			},
-			output: {
-				file: file, // (File instance) — resized image file
-				name: fileName, // (String) — resized image name
-				type: fileType, // (String) — resized image MIME type
-				size: fileSize, // (Number) — resized image size in bytes
-				height: imageHeight, // (Number) — resized image height in pixels
-				width: imageWidth // (Number) — resized image width in pixels
-			}
-		}
+{
+	input: {
+		file: file, // (File instance) — original image file
+		name: fileName, // (String) — original image name
+		type: fileType, // (String) — original image MIME type
+		size: fileSize, // (Number) — original image size in bytes
+		height: imageHeight, // (Number) — original image height in pixels
+		width: imageWidth // (Number) — original image width in pixels
+	},
+	output: {
+		file: file, // (File instance) — resized image file
+		name: fileName, // (String) — resized image name
+		type: fileType, // (String) — resized image MIME type
+		size: fileSize, // (Number) — resized image size in bytes
+		height: imageHeight, // (Number) — resized image height in pixels
+		width: imageWidth // (Number) — resized image width in pixels
+	}
+}
 ```
 <h3>Returns:</h3>
 
 Promise that resolves to a File (blob of the resized image) when get_extra_data is false, otherwise resolves to the extra-data object.
 Example:
 ```html
-	<input type=file id=img_file>
+<input type=file id=img_file>
+
+<script>
 	
-	<script>
-		
-		const input_file = document.getElementById('img_file');
-		input_file.addEventListener('change', () => {
-			if(!input_file.value) return;
-			resize_image_file(input_file.files[0], {heigth: 200, get_extra_data: true}).then(res => {
-				console.log(res);
-				const img = new Image();
-				img.src = URL.createObjectURL(res.output.file);
-				document.body.append(img);
-			});
+	const input_file = document.getElementById('img_file');
+	input_file.addEventListener('change', () => {
+		if(!input_file.value) return;
+		resize_image_file(input_file.files[0], {heigth: 200, get_extra_data: true}).then(res => {
+			console.log(res);
+			const img = new Image();
+			img.src = URL.createObjectURL(res.output.file);
+			document.body.append(img);
 		});
-		
-	</script>
+	});
+	
+</script>
 ```
 
 <h2> How it works </h2>
