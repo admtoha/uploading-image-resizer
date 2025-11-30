@@ -82,7 +82,7 @@ Example:
    ```
    You can also modify the original while creating other versions:
   ```html
-  <input type=file id=origin_img name=big_img data-uploading-image-resizer='target: origin_img, type: webp, max_height: 2000, max_width: 4000'>
+  <input type=file id=origin_img name=big_img data-uploading-image-resizer='type: webp, max_height: 2000, max_width: 4000'>
   <input type=file name=medium_img style='display: none' data-uploading-image-resizer='target: origin_img, type: webp, max_height: 1080, max_width: 1920'>
   <input type=file name=small_img style='display: none' data-uploading-image-resizer='target: origin_img, type: webp, max_height: 500, max_width: 850'>		
   ```
