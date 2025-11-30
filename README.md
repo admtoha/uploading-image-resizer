@@ -3,8 +3,9 @@ Image upload resizing in the browser
 
 This small project solves two common problems:
 
-Users try to upload photos (or other images) and get a frustrating “file too large” error.
-A site that accepts user images grows and begins to suffer degraded server performance or outages.
+- Users try to upload photos (or other images) and get a frustrating “file too large” error.
+- A site that accepts user images grows and begins to suffer degraded server performance or outages.
+
 This tool automatically resizes and (if requested) re-encodes images in the user’s browser “on the fly” before they are sent to your server. It can also produce additional resized versions (e.g., large / medium / small) for responsive needs.
 
 <h2> Live demo </h2>
